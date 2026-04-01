@@ -1,105 +1,216 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Downtime Tracker PDF App</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Downtime Tracker</title>
+
+  <!-- STYLE -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+      color: #1a1a1a;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0a58ca;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    input, button, textarea {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #0a58ca;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #084298;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .row > * {
+      flex: 1;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .summary-card {
+      background: #e9f2ff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .summary-card .value {
+      font-size: 22px;
+      font-weight: bold;
+      color: #0a58ca;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #0a58ca;
+      color: white;
+    }
+
+    .badge-yes {
+      background: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .badge-no {
+      background: #ccc;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .downtime-row {
+      background-color: #ffe5e5;
+    }
+
+    textarea {
+      height: 120px;
+    }
+
+    #status {
+      font-weight: bold;
+      margin-top: 10px;
+      color: #0a58ca;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="app">
-    <header class="header card">
-      <div>
-        <h1>Chadwell Downtime Tracker</h1>
-        <p>Upload a PDF report, extract move times, and calculate downtime by driver.</p>
-      </div>
-    </header>
 
-    <section class="card controls">
-      <h2>1) Upload Report</h2>
-      <label class="upload-box">
-        <input type="file" id="pdfFile" accept="application/pdf" />
-        <span>Select PDF report</span>
-      </label>
+<div class="container">
 
-      <div class="grid two">
-        <label>
-          <span>Downtime threshold (minutes)</span>
-          <input type="number" id="threshold" value="25" min="1" />
-        </label>
-        <label>
-          <span>Time format help</span>
-          <input type="text" value="Supports 8:05, 8:05 AM, 14:05" disabled />
-        </label>
-      </div>
+  <h1>📊 Warehouse Downtime Tracker</h1>
 
-      <details>
-        <summary>Optional parser notes</summary>
-        <p>This app works best when the PDF text contains a driver name and move time on the same line or nearby lines. If your report format is weird, use the raw text panel below to see what the PDF extracted.</p>
-      </details>
+  <!-- UPLOAD -->
+  <div class="card">
+    <h3>1) Upload Report</h3>
 
-      <div class="btn-row">
-        <button id="processBtn">Process PDF</button>
-        <button id="sampleBtn" class="secondary">Load Demo Data</button>
-        <button id="clearBtn" class="secondary">Clear</button>
-      </div>
-      <p id="status" class="status"></p>
-    </section>
+    <input type="file" id="pdfFile" accept="application/pdf">
 
-    <section class="card">
-      <h2>2) Summary</h2>
-      <div id="summaryCards" class="summary-grid"></div>
-    </section>
+    <div class="row">
+      <button id="processBtn">Process PDF</button>
+      <button id="sampleBtn">Load Demo</button>
+      <button id="clearBtn">Clear</button>
+    </div>
 
-    <section class="card">
-      <div class="section-head">
-        <h2>3) Driver Downtime Summary</h2>
-        <button id="exportSummaryBtn" class="secondary">Export Summary CSV</button>
-      </div>
-      <div class="table-wrap">
-        <table id="summaryTable">
-          <thead>
-            <tr>
-              <th>Driver</th>
-              <th>Total Moves</th>
-              <th>Downtime Gaps</th>
-              <th>Total Downtime (min)</th>
-              <th>Longest Gap</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
+    <label>Downtime Threshold (minutes)</label>
+    <input type="number" id="threshold" value="25">
 
-    <section class="card">
-      <div class="section-head">
-        <h2>4) Detailed Gaps</h2>
-        <button id="exportDetailsBtn" class="secondary">Export Details CSV</button>
-      </div>
-      <div class="table-wrap">
-        <table id="detailsTable">
-          <thead>
-            <tr>
-              <th>Driver</th>
-              <th>From</th>
-              <th>To</th>
-              <th>Gap (min)</th>
-              <th>Downtime</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>5) Raw Extracted Text</h2>
-      <textarea id="rawText" rows="12" placeholder="PDF text will appear here so you can verify extraction."></textarea>
-    </section>
+    <p id="status"></p>
   </div>
 
-  <script src="app.js"></script>
+  <!-- RAW TEXT -->
+  <div class="card">
+    <h3>Extracted Text</h3>
+    <textarea id="rawText"></textarea>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="card">
+    <h3>2) Summary</h3>
+    <div id="summaryCards" class="summary-grid"></div>
+
+    <button id="exportSummaryBtn">Export Summary CSV</button>
+
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>Driver</th>
+          <th>Total Moves</th>
+          <th>Downtime Gaps</th>
+          <th>Total Downtime</th>
+          <th>Longest Gap</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- DETAILS -->
+  <div class="card">
+    <h3>3) Downtime Details</h3>
+
+    <button id="exportDetailsBtn">Export Details CSV</button>
+
+    <table id="detailsTable">
+      <thead>
+        <tr>
+          <th>Driver</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Gap</th>
+          <th>Downtime?</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- PDF.js (MUST COME FIRST) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
+</script>
+
+<!-- YOUR APP -->
+<script src="app.js"></script>
+
 </body>
 </html>

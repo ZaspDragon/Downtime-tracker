@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Downtime Tracker PDF App</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="header card">
+      <div>
+        <h1>Chadwell Downtime Tracker</h1>
+        <p>Upload a PDF report, extract move times, and calculate downtime by driver.</p>
+      </div>
+    </header>
+
+    <section class="card controls">
+      <h2>1) Upload Report</h2>
+      <label class="upload-box">
+        <input type="file" id="pdfFile" accept="application/pdf" />
+        <span>Select PDF report</span>
+      </label>
+
+      <div class="grid two">
+        <label>
+          <span>Downtime threshold (minutes)</span>
+          <input type="number" id="threshold" value="25" min="1" />
+        </label>
+        <label>
+          <span>Time format help</span>
+          <input type="text" value="Supports 8:05, 8:05 AM, 14:05" disabled />
+        </label>
+      </div>
+
+      <details>
+        <summary>Optional parser notes</summary>
+        <p>This app works best when the PDF text contains a driver name and move time on the same line or nearby lines. If your report format is weird, use the raw text panel below to see what the PDF extracted.</p>
+      </details>
+
+      <div class="btn-row">
+        <button id="processBtn">Process PDF</button>
+        <button id="sampleBtn" class="secondary">Load Demo Data</button>
+        <button id="clearBtn" class="secondary">Clear</button>
+      </div>
+      <p id="status" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>2) Summary</h2>
+      <div id="summaryCards" class="summary-grid"></div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>3) Driver Downtime Summary</h2>
+        <button id="exportSummaryBtn" class="secondary">Export Summary CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table id="summaryTable">
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>Total Moves</th>
+              <th>Downtime Gaps</th>
+              <th>Total Downtime (min)</th>
+              <th>Longest Gap</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-head">
+        <h2>4) Detailed Gaps</h2>
+        <button id="exportDetailsBtn" class="secondary">Export Details CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table id="detailsTable">
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Gap (min)</th>
+              <th>Downtime</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>5) Raw Extracted Text</h2>
+      <textarea id="rawText" rows="12" placeholder="PDF text will appear here so you can verify extraction."></textarea>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -14,6 +14,9 @@ const exportDetailsBtn = document.getElementById("exportDetailsBtn");
 let latestSummary = [];
 let latestDetails = [];
 
+// 2 breaks + lunch = 60 minutes not counted
+const NON_COUNTED_BREAK_MINUTES = 60;
+
 function setStatus(message) {
   statusEl.textContent = message || "";
 }
@@ -128,7 +131,7 @@ function computeDowntime(records, threshold) {
     times.sort((a, b) => a - b);
 
     let downtimeGaps = 0;
-    let totalDowntime = 0;
+    let rawDowntime = 0;
     let longestGap = 0;
 
     for (let i = 0; i < times.length - 1; i++) {
@@ -137,7 +140,7 @@ function computeDowntime(records, threshold) {
 
       if (isDowntime) {
         downtimeGaps += 1;
-        totalDowntime += gap;
+        rawDowntime += gap;
         if (gap > longestGap) longestGap = gap;
       }
 
@@ -151,12 +154,18 @@ function computeDowntime(records, threshold) {
       });
     }
 
+    const adjustedDowntime = Math.max(0, rawDowntime - NON_COUNTED_BREAK_MINUTES);
+
     summary.push({
       driver,
       totalMoves: times.length,
       downtimeGaps,
-      totalDowntime,
-      totalDowntimeDisplay: formatGap(totalDowntime),
+      rawDowntime,
+      rawDowntimeDisplay: formatGap(rawDowntime),
+      deductedBreaks: NON_COUNTED_BREAK_MINUTES,
+      deductedBreaksDisplay: formatGap(NON_COUNTED_BREAK_MINUTES),
+      totalDowntime: adjustedDowntime,
+      totalDowntimeDisplay: formatGap(adjustedDowntime),
       longestGap,
       longestGapDisplay: formatGap(longestGap)
     });
@@ -188,7 +197,7 @@ function renderCards(summary) {
       <div class="value">${totalDowntimeGaps}</div>
     </div>
     <div class="summary-card">
-      <div class="label">Downtime Minutes</div>
+      <div class="label">Adjusted Downtime Minutes</div>
       <div class="value">${totalDowntimeMinutes}</div>
     </div>
   `;
@@ -200,6 +209,8 @@ function renderTables(summary, details, threshold) {
       <td>${escapeHtml(row.driver)}</td>
       <td>${row.totalMoves}</td>
       <td>${row.downtimeGaps}</td>
+      <td>${escapeHtml(row.rawDowntimeDisplay)}</td>
+      <td>${escapeHtml(row.deductedBreaksDisplay)}</td>
       <td>${escapeHtml(row.totalDowntimeDisplay)}</td>
       <td>${escapeHtml(row.longestGapDisplay)}</td>
     </tr>
@@ -307,7 +318,7 @@ async function processInput() {
 
     renderCards(summary);
     renderTables(summary, details, threshold);
-    setStatus(`Done. Found ${records.length} time records across ${summary.length} drivers.`);
+    setStatus(`Done. Found ${records.length} time records across ${summary.length} drivers. 60 minutes of breaks/lunch deducted per driver.`);
   } catch (error) {
     console.error(error);
     setStatus(`Error: ${error.message}`);

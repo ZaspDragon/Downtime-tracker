@@ -2,215 +2,268 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Downtime Tracker</title>
-
-  <!-- STYLE -->
   <style>
+    * { box-sizing: border-box; }
+
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f7fb;
-      margin: 0;
+      color: #1f2937;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
       padding: 20px;
-      color: #1a1a1a;
     }
 
     h1 {
-      text-align: center;
-      color: #0a58ca;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: auto;
+      margin: 0 0 16px;
+      color: #0b5ed7;
     }
 
     .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.06);
     }
 
-    input, button, textarea {
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 100%;
-      box-sizing: border-box;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
     }
 
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input[type="file"],
+    input[type="number"],
+    textarea,
     button {
-      background: #0a58ca;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      padding: 10px 12px;
+      font-size: 15px;
     }
 
-    button:hover {
-      background: #084298;
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      font-family: Arial, sans-serif;
     }
 
     .row {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 10px;
-      flex-wrap: wrap;
+      margin-top: 10px;
     }
 
-    .row > * {
-      flex: 1;
+    button {
+      border: none;
+      background: #0b5ed7;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0a53be;
+    }
+
+    button.secondary {
+      background: #6b7280;
+    }
+
+    button.secondary:hover {
+      background: #5b6471;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-weight: 700;
+      color: #0b5ed7;
+      min-height: 22px;
     }
 
     .summary-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
     }
 
     .summary-card {
-      background: #e9f2ff;
-      padding: 15px;
-      border-radius: 8px;
+      background: #eef4ff;
+      border: 1px solid #dbe8ff;
+      border-radius: 12px;
+      padding: 14px;
       text-align: center;
     }
 
+    .summary-card .label {
+      font-size: 13px;
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+
     .summary-card .value {
-      font-size: 22px;
-      font-weight: bold;
-      color: #0a58ca;
+      font-size: 24px;
+      font-weight: 800;
+      color: #0b5ed7;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 12px;
+      background: white;
     }
 
     th, td {
       padding: 10px;
-      border-bottom: 1px solid #ddd;
-      text-align: center;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+      font-size: 14px;
     }
 
     th {
-      background: #0a58ca;
+      background: #0b5ed7;
       color: white;
+      position: sticky;
+      top: 0;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .badge-yes,
+    .badge-no {
+      display: inline-block;
+      min-width: 56px;
+      text-align: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
     }
 
     .badge-yes {
-      background: red;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 5px;
+      background: #fee2e2;
+      color: #b91c1c;
     }
 
     .badge-no {
-      background: #ccc;
-      padding: 5px 10px;
-      border-radius: 5px;
+      background: #e5e7eb;
+      color: #374151;
     }
 
     .downtime-row {
-      background-color: #ffe5e5;
+      background: #fff1f2;
     }
 
-    textarea {
-      height: 120px;
-    }
-
-    #status {
-      font-weight: bold;
-      margin-top: 10px;
-      color: #0a58ca;
+    .hint {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 6px;
     }
   </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <h1>Downtime Tracker</h1>
 
-<div class="container">
+    <div class="card">
+      <div class="grid">
+        <div>
+          <label for="fileInput">Upload TXT or Word (.docx)</label>
+          <input type="file" id="fileInput" accept=".txt,.docx" />
+          <div class="hint">TXT is easiest. DOCX also works.</div>
+        </div>
 
-  <h1>📊 Warehouse Downtime Tracker</h1>
+        <div>
+          <label for="threshold">Downtime threshold (minutes)</label>
+          <input type="number" id="threshold" value="25" min="1" />
+          <div class="hint">Anything over this gap is marked downtime.</div>
+        </div>
+      </div>
 
-  <!-- UPLOAD -->
-  <div class="card">
-    <h3>1) Upload Report</h3>
+      <div class="row">
+        <button id="processBtn">Analyze Text</button>
+        <button id="demoBtn">Load Demo</button>
+        <button id="clearBtn" class="secondary">Clear</button>
+      </div>
 
-    <input type="file" id="pdfFile" accept="application/pdf">
-
-    <div class="row">
-      <button id="processBtn">Process PDF</button>
-      <button id="sampleBtn">Load Demo</button>
-      <button id="clearBtn">Clear</button>
+      <div id="status" class="status"></div>
     </div>
 
-    <label>Downtime Threshold (minutes)</label>
-    <input type="number" id="threshold" value="25">
+    <div class="card">
+      <label for="rawText">Paste report text here</label>
+      <textarea id="rawText" placeholder="Paste your report text here, or upload a TXT / DOCX file."></textarea>
+      <div class="hint">
+        Best format: one line per move like: <strong>Brandon Evanshine 13:44:35</strong>
+      </div>
+    </div>
 
-    <p id="status"></p>
+    <div class="card">
+      <h2 style="margin-top:0;">Summary</h2>
+      <div id="summaryCards" class="summary-grid"></div>
+
+      <div class="row" style="margin-top:14px;">
+        <button id="exportSummaryBtn">Export Summary CSV</button>
+        <button id="exportDetailsBtn">Export Details CSV</button>
+      </div>
+
+      <div class="table-wrap">
+        <table id="summaryTable">
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>Total Moves</th>
+              <th>Downtime Gaps</th>
+              <th>Total Downtime</th>
+              <th>Longest Gap</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">Downtime Details</h2>
+      <div class="table-wrap">
+        <table id="detailsTable">
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>From</th>
+              <th>To</th>
+              <th>Gap</th>
+              <th>Downtime?</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
-  <!-- RAW TEXT -->
-  <div class="card">
-    <h3>Extracted Text</h3>
-    <textarea id="rawText"></textarea>
-  </div>
-
-  <!-- SUMMARY -->
-  <div class="card">
-    <h3>2) Summary</h3>
-    <div id="summaryCards" class="summary-grid"></div>
-
-    <button id="exportSummaryBtn">Export Summary CSV</button>
-
-    <table id="summaryTable">
-      <thead>
-        <tr>
-          <th>Driver</th>
-          <th>Total Moves</th>
-          <th>Downtime Gaps</th>
-          <th>Total Downtime</th>
-          <th>Longest Gap</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- DETAILS -->
-  <div class="card">
-    <h3>3) Downtime Details</h3>
-
-    <button id="exportDetailsBtn">Export Details CSV</button>
-
-    <table id="detailsTable">
-      <thead>
-        <tr>
-          <th>Driver</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Gap</th>
-          <th>Downtime?</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-</div>
-
-<!-- PDF.js (MUST COME FIRST) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
-<script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
-</script>
-
-<!-- YOUR APP -->
-<script src="app.js"></script>
-
+  <!-- DOCX reader -->
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>

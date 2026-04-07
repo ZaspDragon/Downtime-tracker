@@ -25,6 +25,11 @@
       color: #0b5ed7;
     }
 
+    h2 {
+      margin-bottom: 10px;
+      color: #111827;
+    }
+
     .card {
       background: #fff;
       border-radius: 14px;
@@ -180,11 +185,68 @@
       color: #6b7280;
       margin-top: 6px;
     }
+
+    .break-box {
+      background: #f8fbff;
+      border: 1px solid #dbe8ff;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 14px;
+    }
+
+    .break-box h3 {
+      margin: 0 0 10px;
+      color: #0b5ed7;
+      font-size: 16px;
+    }
+
+    .break-list {
+      margin: 0;
+      padding-left: 18px;
+      color: #374151;
+    }
+
+    .break-list li {
+      margin-bottom: 6px;
+    }
+
+    .top-note {
+      background: #e8f1ff;
+      border: 1px solid #cfe0ff;
+      color: #0b3d91;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      th, td {
+        font-size: 13px;
+        padding: 8px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Downtime Tracker</h1>
+
+    <div class="top-note">
+      Downtime over the selected threshold is tracked after excluding scheduled breaks and lunch.
+    </div>
 
     <div class="card">
       <div class="grid">
@@ -197,8 +259,17 @@
         <div>
           <label for="threshold">Downtime threshold (minutes)</label>
           <input type="number" id="threshold" value="25" min="1" />
-          <div class="hint">Anything over this gap is marked downtime.</div>
+          <div class="hint">Anything over this gap is marked downtime after break/lunch time is removed.</div>
         </div>
+      </div>
+
+      <div class="break-box">
+        <h3>Excluded Break Times</h3>
+        <ul class="break-list">
+          <li>Break 1: 8:00 AM - 8:15 AM</li>
+          <li>Break 2: 10:00 AM - 10:15 AM</li>
+          <li>Lunch: 12:00 PM - 12:30 PM</li>
+        </ul>
       </div>
 
       <div class="row">
@@ -245,6 +316,8 @@
 
     <div class="card">
       <h2 style="margin-top:0;">Downtime Details</h2>
+      <div class="hint">Scheduled breaks and lunch should be excluded from gap calculations by the JavaScript logic.</div>
+
       <div class="table-wrap">
         <table id="detailsTable">
           <thead>

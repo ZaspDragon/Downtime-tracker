@@ -37,6 +37,25 @@
         </div>
       </div>
 
+      <!-- Employee Filter -->
+      <div class="filter-section">
+        <div class="filter-header">
+          <label class="toggle-label">
+            <input type="checkbox" id="filterToggle" checked />
+            <span class="toggle-text">🎯 Filter by Employee</span>
+          </label>
+          <button id="clearFilterBtn" class="small secondary">Clear Filter</button>
+        </div>
+        <div id="filterControls">
+          <div class="filter-tags" id="filterTags"></div>
+          <div class="filter-input-row">
+            <input type="text" id="filterInput" placeholder="Type a name and press Enter to add…" />
+            <button id="addFilterBtn" class="small">+ Add</button>
+          </div>
+          <div class="hint">Only employees matching these names will be analyzed. Partial matching is used (e.g. "Henry" matches "Henry Chapman").</div>
+        </div>
+      </div>
+
       <!-- Break schedule -->
       <details class="break-info">
         <summary>⏰ Excluded Break Schedule</summary>

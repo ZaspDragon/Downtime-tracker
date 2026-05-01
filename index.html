@@ -3,309 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Downtime Tracker</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #1f2937;
-    }
-
-    .wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    h1 {
-      margin: 0 0 16px;
-      color: #0b5ed7;
-    }
-
-    h2 {
-      margin-bottom: 10px;
-      color: #111827;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 18px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.06);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 12px;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    input[type="file"],
-    input[type="number"],
-    textarea,
-    button {
-      width: 100%;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      padding: 10px 12px;
-      font-size: 15px;
-    }
-
-    textarea {
-      min-height: 180px;
-      resize: vertical;
-      font-family: Arial, sans-serif;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    button {
-      border: none;
-      background: #0b5ed7;
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0a53be;
-    }
-
-    button.secondary {
-      background: #6b7280;
-    }
-
-    button.secondary:hover {
-      background: #5b6471;
-    }
-
-    .status {
-      margin-top: 10px;
-      font-weight: 700;
-      color: #0b5ed7;
-      min-height: 22px;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-top: 8px;
-    }
-
-    .summary-card {
-      background: #eef4ff;
-      border: 1px solid #dbe8ff;
-      border-radius: 12px;
-      padding: 14px;
-      text-align: center;
-    }
-
-    .summary-card .label {
-      font-size: 13px;
-      color: #4b5563;
-      margin-bottom: 6px;
-    }
-
-    .summary-card .value {
-      font-size: 24px;
-      font-weight: 800;
-      color: #0b5ed7;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-      background: white;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    th {
-      background: #0b5ed7;
-      color: white;
-      position: sticky;
-      top: 0;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-    }
-
-    .badge-yes,
-    .badge-no {
-      display: inline-block;
-      min-width: 56px;
-      text-align: center;
-      padding: 5px 8px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 12px;
-    }
-
-    .badge-yes {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .badge-no {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
-    .downtime-row {
-      background: #fff1f2;
-    }
-
-    .hint {
-      font-size: 13px;
-      color: #6b7280;
-      margin-top: 6px;
-    }
-
-    .break-box {
-      background: #f8fbff;
-      border: 1px solid #dbe8ff;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 14px;
-    }
-
-    .break-box h3 {
-      margin: 0 0 10px;
-      color: #0b5ed7;
-      font-size: 16px;
-    }
-
-    .break-list {
-      margin: 0;
-      padding-left: 18px;
-      color: #374151;
-    }
-
-    .break-list li {
-      margin-bottom: 6px;
-    }
-
-    .top-note {
-      background: #e8f1ff;
-      border: 1px solid #cfe0ff;
-      color: #0b3d91;
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      font-weight: 700;
-    }
-
-    @media (max-width: 640px) {
-      .wrap {
-        padding: 12px;
-      }
-
-      .card {
-        padding: 14px;
-      }
-
-      h1 {
-        font-size: 26px;
-      }
-
-      th, td {
-        font-size: 13px;
-        padding: 8px;
-      }
-    }
-  </style>
+  <title>Downtime Tracker — Bin Transfer Productivity</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <h1>Downtime Tracker</h1>
-
-    <div class="top-note">
-      Downtime over the selected threshold is tracked after excluding scheduled breaks and lunch.
+  <div class="app">
+    <!-- Header -->
+    <div class="card header">
+      <h1>📦 Downtime Tracker</h1>
+      <p>Bin Transfer Productivity — Break-adjusted gap detection</p>
     </div>
 
+    <!-- Status banner -->
+    <div id="statusBanner" class="status-banner hidden"></div>
+
+    <!-- Controls -->
     <div class="card">
-      <div class="grid">
-        <div>
-          <label for="fileInput">Upload TXT or Word (.docx)</label>
-          <input type="file" id="fileInput" accept=".txt,.docx" />
-          <div class="hint">TXT is easiest. DOCX also works.</div>
-        </div>
+      <div class="grid two">
+        <label>
+          <span>Upload Report (TXT, CSV, or DOCX)</span>
+          <div class="upload-box" id="uploadBox">
+            <input type="file" id="fileInput" accept=".txt,.csv,.docx" />
+            <span id="uploadLabel">📁 Click or drag file here</span>
+          </div>
+        </label>
 
         <div>
-          <label for="threshold">Downtime threshold (minutes)</label>
-          <input type="number" id="threshold" value="25" min="1" />
-          <div class="hint">Anything over this gap is marked downtime after break/lunch time is removed.</div>
+          <label>
+            <span>Downtime Threshold (minutes)</span>
+            <input type="number" id="threshold" value="25" min="1" />
+          </label>
+          <div class="hint">Gaps over this are flagged as downtime (breaks excluded).</div>
         </div>
       </div>
 
-      <div class="break-box">
-        <h3>Excluded Break Times</h3>
-        <ul class="break-list">
-          <li>Break 1: 8:00 AM - 8:15 AM</li>
-          <li>Break 2: 10:00 AM - 10:15 AM</li>
-          <li>Lunch: 12:00 PM - 12:30 PM</li>
-        </ul>
-      </div>
+      <!-- Break schedule -->
+      <details class="break-info">
+        <summary>⏰ Excluded Break Schedule</summary>
+        <div class="break-grid">
+          <div class="break-item">
+            <strong>Break 1</strong>
+            <span>8:00 – 8:15 AM</span>
+          </div>
+          <div class="break-item">
+            <strong>Break 2</strong>
+            <span>10:00 – 10:15 AM</span>
+          </div>
+          <div class="break-item">
+            <strong>Lunch</strong>
+            <span>12:00 – 12:30 PM</span>
+          </div>
+        </div>
+        <p>Break time that falls within a gap is automatically subtracted before comparing to the threshold.</p>
+      </details>
 
-      <div class="row">
-        <button id="processBtn">Analyze Text</button>
-        <button id="demoBtn">Load Demo</button>
+      <div class="btn-row">
+        <button id="processBtn">▶ Analyze</button>
+        <button id="pasteBtn" class="secondary">📋 Paste from Report</button>
+        <button id="demoBtn" class="secondary">Demo Data</button>
         <button id="clearBtn" class="secondary">Clear</button>
       </div>
-
-      <div id="status" class="status"></div>
     </div>
 
+    <!-- Paste area -->
     <div class="card">
-      <label for="rawText">Paste report text here</label>
-      <textarea id="rawText" placeholder="Paste your report text here, or upload a TXT / DOCX file."></textarea>
-      <div class="hint">
-        Best format: one line per move like: <strong>Brandon Evanshine 13:44:35</strong>
+      <label>
+        <span>Report Data</span>
+        <textarea id="rawText" placeholder="Paste your Bin Transfer Productivity report text here, or upload a file above.&#10;&#10;Supports formats:&#10;  • CSV from SSRS (Employee,ItemXferd,XferQty,...)&#10;  • Simple format: Employee Name  HH:MM:SS&#10;  • Tab-separated table data"></textarea>
+      </label>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="card" id="resultsSection" style="display:none;">
+      <div class="section-head">
+        <h2>Summary</h2>
+        <div class="btn-row">
+          <button id="exportSummaryBtn" class="small">📥 Summary CSV</button>
+          <button id="exportDetailsBtn" class="small">📥 Details CSV</button>
+        </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2 style="margin-top:0;">Summary</h2>
       <div id="summaryCards" class="summary-grid"></div>
-
-      <div class="row" style="margin-top:14px;">
-        <button id="exportSummaryBtn">Export Summary CSV</button>
-        <button id="exportDetailsBtn">Export Details CSV</button>
-      </div>
 
       <div class="table-wrap">
         <table id="summaryTable">
           <thead>
             <tr>
-              <th>Driver</th>
-              <th>Total Moves</th>
+              <th>Employee</th>
+              <th>Moves</th>
               <th>Downtime Gaps</th>
-              <th>Total Downtime</th>
+              <th>Raw Downtime</th>
+              <th>Break Deducted</th>
+              <th>Adjusted Downtime</th>
               <th>Longest Gap</th>
             </tr>
           </thead>
@@ -314,18 +103,24 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2 style="margin-top:0;">Downtime Details</h2>
-      <div class="hint">Scheduled breaks and lunch should be excluded from gap calculations by the JavaScript logic.</div>
+    <!-- Downtime Details -->
+    <div class="card" id="detailsSection" style="display:none;">
+      <div class="section-head">
+        <h2>Gap Details</h2>
+      </div>
+
+      <div class="hint">Break overlap is subtracted from each gap individually. Only adjusted gaps over the threshold are flagged.</div>
 
       <div class="table-wrap">
         <table id="detailsTable">
           <thead>
             <tr>
-              <th>Driver</th>
+              <th>Employee</th>
               <th>From</th>
               <th>To</th>
-              <th>Gap</th>
+              <th>Raw Gap</th>
+              <th>Break</th>
+              <th>Adjusted</th>
               <th>Downtime?</th>
             </tr>
           </thead>

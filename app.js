@@ -22,8 +22,62 @@ const detailsSection  = document.getElementById("detailsSection");
 const exportSummaryBtn = document.getElementById("exportSummaryBtn");
 const exportDetailsBtn = document.getElementById("exportDetailsBtn");
 
+const filterToggle   = document.getElementById("filterToggle");
+const filterTags     = document.getElementById("filterTags");
+const filterInput    = document.getElementById("filterInput");
+const addFilterBtn   = document.getElementById("addFilterBtn");
+const clearFilterBtn = document.getElementById("clearFilterBtn");
+const filterControls = document.getElementById("filterControls");
+
 let latestSummary = [];
 let latestDetails = [];
+
+/* ── Employee filter ── */
+let filterNames = ["Henry", "Dawitt", "Yussif", "Kristopher"];
+
+function renderFilterTags() {
+  filterTags.innerHTML = filterNames.map((n, i) => `
+    <span class="filter-tag">
+      ${esc(n)}
+      <button class="tag-remove" data-idx="${i}" title="Remove">&times;</button>
+    </span>`).join("");
+  filterTags.querySelectorAll(".tag-remove").forEach(btn => {
+    btn.addEventListener("click", () => {
+      filterNames.splice(Number(btn.dataset.idx), 1);
+      renderFilterTags();
+    });
+  });
+}
+
+function addFilterName() {
+  const name = filterInput.value.trim();
+  if (name && !filterNames.some(n => n.toLowerCase() === name.toLowerCase())) {
+    filterNames.push(name);
+    renderFilterTags();
+  }
+  filterInput.value = "";
+  filterInput.focus();
+}
+
+addFilterBtn.addEventListener("click", addFilterName);
+filterInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addFilterName(); } });
+clearFilterBtn.addEventListener("click", () => { filterNames = []; renderFilterTags(); });
+
+filterToggle.addEventListener("change", () => {
+  filterControls.style.display = filterToggle.checked ? "" : "none";
+});
+
+// Initial render
+renderFilterTags();
+
+function filterRecords(records) {
+  if (!filterToggle.checked || filterNames.length === 0) return records;
+  const lowerNames = filterNames.map(n => n.toLowerCase());
+  return records.filter(r => {
+    const driverLower = r.driver.toLowerCase();
+    return lowerNames.some(n => driverLower.includes(n));
+  });
+}
 
 /* ── Break schedule (minutes from midnight) ── */
 const BREAKS = [
@@ -347,11 +401,19 @@ async function processInput() {
     return;
   }
 
-  const records = extractRecords(text);
-  if (!records.length) {
+  const allRecords = extractRecords(text);
+  if (!allRecords.length) {
     resultsSection.style.display = "none";
     detailsSection.style.display = "none";
     showStatus("No employee/time records found. Check the data format.", "error");
+    return;
+  }
+
+  const records = filterRecords(allRecords);
+  if (!records.length) {
+    resultsSection.style.display = "none";
+    detailsSection.style.display = "none";
+    showStatus(`No records found for filtered employees (${filterNames.join(", ")}). Check names or disable the filter.`, "error");
     return;
   }
 
@@ -370,14 +432,18 @@ async function processInput() {
   const downtimeDrivers = summary.filter(s => s.downtimeGaps > 0).length;
   const totalGaps       = summary.reduce((s, r) => s + r.downtimeGaps, 0);
 
+  const filterNote = (filterToggle.checked && filterNames.length > 0)
+    ? ` (filtered to: ${filterNames.join(", ")})`
+    : "";
+
   if (totalGaps > 0) {
     showStatus(
-      `✅ Analyzed ${records.length} records across ${summary.length} employees. Found ${totalGaps} downtime gaps (${downtimeDrivers} employees). Break time automatically deducted.`,
+      `✅ Analyzed ${records.length} records across ${summary.length} employees${filterNote}. Found ${totalGaps} downtime gaps (${downtimeDrivers} employees). Break time automatically deducted.`,
       "success"
     );
   } else {
     showStatus(
-      `✅ Analyzed ${records.length} records across ${summary.length} employees. No downtime gaps detected!`,
+      `✅ Analyzed ${records.length} records across ${summary.length} employees${filterNote}. No downtime gaps detected!`,
       "success"
     );
   }
@@ -419,7 +485,13 @@ Kristopher Mintier,107072,31,RB-41-3,RB-11-2,1,06:38:08,21,4,5.25,5/1/2026,OH01
 Kristopher Mintier,107265,19,RB-41-3,RB-15-1,1,06:40:51,21,4,5.25,5/1/2026,OH01
 Kristopher Mintier,107293,5,RB-41-3,RB-39-4,1,06:42:45,21,4,5.25,5/1/2026,OH01
 Kristopher Mintier,107265,27,RB-41-3,RB-38-2,1,06:44:59,21,4,5.25,5/1/2026,OH01
-Kristopher Mintier,163122,50,RB-41-3,RB-33-4,1,07:44:08,21,4,5.25,5/1/2026,OH01`;
+Kristopher Mintier,163122,50,RB-41-3,RB-33-4,1,07:44:08,21,4,5.25,5/1/2026,OH01
+Dawitt Tesfaye,501011,30,D-12-4,D-05-1,1,06:22:10,18,4,4.50,5/1/2026,OH01
+Dawitt Tesfaye,502033,12,D-18-5,D-10-2,1,06:35:47,18,4,4.50,5/1/2026,OH01
+Dawitt Tesfaye,503015,8,D-25-3,D-14-1,1,06:54:22,18,4,4.50,5/1/2026,OH01
+Dawitt Tesfaye,504027,25,D-31-6,D-20-2,1,07:02:18,18,4,4.50,5/1/2026,OH01
+Dawitt Tesfaye,505019,40,D-38-4,D-25-1,1,08:45:33,18,4,4.50,5/1/2026,OH01
+Dawitt Tesfaye,506042,15,D-42-5,D-30-2,1,09:10:05,18,4,4.50,5/1/2026,OH01`;
   processInput();
 }
 

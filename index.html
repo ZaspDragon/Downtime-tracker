@@ -56,24 +56,18 @@
         </div>
       </div>
 
-      <!-- Break schedule -->
-      <details class="break-info">
-        <summary>⏰ Excluded Break Schedule</summary>
-        <div class="break-grid">
-          <div class="break-item">
-            <strong>Break 1</strong>
-            <span>8:00 – 8:15 AM</span>
-          </div>
-          <div class="break-item">
-            <strong>Break 2</strong>
-            <span>10:00 – 10:15 AM</span>
-          </div>
-          <div class="break-item">
-            <strong>Lunch</strong>
-            <span>12:00 – 12:30 PM</span>
-          </div>
+      <!-- Editable break schedule -->
+      <details class="break-info" open>
+        <summary>⏰ Excluded Break Schedule — Edit Times</summary>
+        <div class="hint">Customize your scheduled breaks. Saved on this device; overlaps are counted only once.</div>
+        <div id="breakScheduleRows" class="break-schedule-rows"></div>
+        <div class="btn-row">
+          <button type="button" id="addBreakBtn" class="small secondary">+ Add Break</button>
+          <button type="button" id="saveBreaksBtn" class="small">Save Schedule</button>
+          <button type="button" id="resetBreaksBtn" class="small secondary">Reset Defaults</button>
         </div>
-        <p>Break time that falls within a gap is automatically subtracted before comparing to the threshold.</p>
+        <div id="breakScheduleMessage" class="hint" role="status" aria-live="polite"></div>
+        <p>Break time within each gap is deducted before checking the downtime threshold. Changes take effect after saving.</p>
       </details>
 
       <div class="btn-row">

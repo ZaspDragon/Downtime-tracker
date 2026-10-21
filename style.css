@@ -453,3 +453,13 @@ tr.has-downtime td:first-child {
   .btn-row { flex-direction: column; }
   .section-head { flex-direction: column; align-items: flex-start; }
 }
+
+/* Editable break schedule */
+.break-schedule-rows { display: grid; gap: 10px; margin: 12px 0; }
+.break-edit-row { display: grid; grid-template-columns: minmax(120px, 1.5fr) minmax(100px, 1fr) minmax(100px, 1fr) auto; gap: 8px; align-items: center; }
+.break-edit-row input { width: 100%; min-width: 0; box-sizing: border-box; }
+.break-edit-row button { white-space: nowrap; }
+@media (max-width: 640px) {
+  .break-edit-row { grid-template-columns: 1fr 1fr; }
+  .break-edit-row input:first-child { grid-column: 1 / -1; }
+}

@@ -79,12 +79,103 @@ function filterRecords(records) {
   });
 }
 
-/* ── Break schedule (minutes from midnight) ── */
-const BREAKS = [
-  { start: 8 * 60,       end: 8 * 60 + 15,  label: "Break 1" },   // 8:00-8:15
-  { start: 10 * 60,      end: 10 * 60 + 15,  label: "Break 2" },   // 10:00-10:15
-  { start: 12 * 60,      end: 12 * 60 + 30,  label: "Lunch" },     // 12:00-12:30
+/* ── Editable break schedule (minutes from midnight) ── */
+const DEFAULT_BREAKS = [
+  { start: 480, end: 495, label: "Break 1" },
+  { start: 600, end: 615, label: "Break 2" },
+  { start: 720, end: 750, label: "Lunch" }
 ];
+const BREAK_STORAGE_KEY = "downtime-tracker-break-schedule-v1";
+const breakRows = document.getElementById("breakScheduleRows");
+const breakMessage = document.getElementById("breakScheduleMessage");
+let BREAKS = DEFAULT_BREAKS.map(b => ({ ...b }));
+
+function timeInputValue(minutes) {
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+}
+function timeInputMinutes(value) {
+  if (!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(value)) return null;
+  const [hours, minutes] = value.split(":").map(Number);
+  return hours * 60 + minutes;
+}
+function validateBreaks(breaks) {
+  if (!Array.isArray(breaks) || breaks.length > 20) return null;
+  const validated = [];
+  for (const b of breaks) {
+    if (!b || typeof b.label !== "string" || b.label.trim().length > 60 ||
+        !Number.isInteger(b.start) || !Number.isInteger(b.end) ||
+        b.start < 0 || b.end > 1440 || b.start >= b.end) return null;
+    validated.push({ label: b.label.trim() || "Break", start: b.start, end: b.end });
+  }
+  return validated;
+}
+function addBreakRow(b = { label: "New Break", start: 780, end: 795 }) {
+  const row = document.createElement("div");
+  row.className = "break-edit-row";
+  const name = document.createElement("input");
+  name.type = "text"; name.maxLength = 60; name.value = b.label;
+  name.setAttribute("aria-label", "Break name");
+  const begin = document.createElement("input");
+  begin.type = "time"; begin.value = timeInputValue(b.start);
+  begin.setAttribute("aria-label", "Break start time");
+  const end = document.createElement("input");
+  end.type = "time"; end.value = timeInputValue(b.end);
+  end.setAttribute("aria-label", "Break end time");
+  const remove = document.createElement("button");
+  remove.type = "button"; remove.className = "small secondary"; remove.textContent = "Remove";
+  remove.addEventListener("click", () => row.remove());
+  row.append(name, begin, end, remove);
+  breakRows.append(row);
+}
+function renderBreakRows() {
+  breakRows.replaceChildren();
+  BREAKS.forEach(addBreakRow);
+}
+function saveBreakSchedule() {
+  const candidate = [...breakRows.querySelectorAll(".break-edit-row")].map(row => {
+    const fields = row.querySelectorAll("input");
+    return { label: fields[0].value, start: timeInputMinutes(fields[1].value), end: timeInputMinutes(fields[2].value) };
+  });
+  const validated = validateBreaks(candidate);
+  if (!validated) {
+    breakMessage.textContent = "Check break times: each start must be before its end, on the same day. Maximum 20 breaks.";
+    breakMessage.style.color = "#c0392b";
+    return;
+  }
+  try {
+    localStorage.setItem(BREAK_STORAGE_KEY, JSON.stringify(validated));
+  } catch {
+    breakMessage.textContent = "Could not save to browser storage. Your changes will apply for this session.";
+  }
+  BREAKS = validated;
+  renderBreakRows();
+  if (!breakMessage.textContent.includes("Could not")) breakMessage.textContent = "Schedule saved. Downtime calculations updated.";
+  breakMessage.style.color = "";
+  if (resultsSection.style.display !== "none") processInput();
+}
+try {
+  const saved = localStorage.getItem(BREAK_STORAGE_KEY);
+  if (saved !== null) {
+    const validated = validateBreaks(JSON.parse(saved));
+    if (validated) BREAKS = validated;
+  }
+} catch {
+  // Browser storage may be disabled; defaults remain usable.
+}
+renderBreakRows();
+document.getElementById("addBreakBtn").addEventListener("click", () => {
+  if (breakRows.children.length >= 20) {
+    breakMessage.textContent = "Maximum 20 breaks.";
+    return;
+  }
+  addBreakRow();
+});
+document.getElementById("saveBreaksBtn").addEventListener("click", saveBreakSchedule);
+document.getElementById("resetBreaksBtn").addEventListener("click", () => {
+  BREAKS = DEFAULT_BREAKS.map(b => ({ ...b }));
+  renderBreakRows();
+  saveBreakSchedule();
+});
 
 /* ── Helpers ── */
 function esc(text) {
@@ -131,11 +222,14 @@ function formatGap(minutes) {
 }
 
 function overlapWithBreaks(startMin, endMin) {
-  let total = 0;
-  for (const brk of BREAKS) {
-    const os = Math.max(startMin, brk.start);
-    const oe = Math.min(endMin, brk.end);
-    if (os < oe) total += (oe - os);
+  const intervals = BREAKS
+    .map(brk => [Math.max(startMin, brk.start), Math.min(endMin, brk.end)])
+    .filter(([start, end]) => start < end)
+    .sort((a, b) => a[0] - b[0]);
+  let total = 0, coveredUntil = startMin;
+  for (const [start, end] of intervals) {
+    total += Math.max(0, end - Math.max(start, coveredUntil));
+    coveredUntil = Math.max(coveredUntil, end);
   }
   return total;
 }
